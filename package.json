@@ -1,0 +1,19 @@
+{
+  "name": "coffeescript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Zohanaft/coffee_script.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zohanaft/coffee_script/issues"
+  },
+  "homepage": "https://github.com/Zohanaft/coffee_script#readme"
+}
