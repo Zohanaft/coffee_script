@@ -9,7 +9,7 @@ class Drawer
     ctx.beginPath()
     ctx.lineTo(origin.x + path[index], origin.y + path[index+1]) for pair, index in path by 2
     ctx.closePath()
-    ctx.fillStyle = color or 'black'
+    ctx.fillStyle = color
     ctx.fill()
 
   clear: (color, origin, width, height) ->

@@ -51,7 +51,11 @@ export class Nova
   intersect: (x1,y1,x2,y2,x3,y3,x4,y4) ->
     return @intersect_1(x1,x2,x3,x4) and @intersect_1(y1,y2,y3,y4) and @area(x1,y1,x2,y2,x3,y3) * @area(x1,y1,x2,y2,x4,y4) <= 0 and @area(x3,y3,x4,y4,x1,y1) * @area(x3,y3,x4,y4,x2,y2) <=0
 
-
+  intercect_2: (x1,y1,x2,y2,x3,y3,x4,y4) ->
+    x = ((x1*y2-x2*y1)*(x4-x3)-(x3*y4-x4*y3)*(x2-x1))/((y1-y2)*(x4-x3)-(y3-y4)*(x2-x1))
+    y = ((y3-y4)*x-(x3*y4-x4*y3))/(x4-x3)
+    if (((x1<=x)and(x2>=x)and(x3<=x)and(x4>=x))or((y1<=y)and(y2>=y) and(y3<=y)and(y4>=y)))
+      return true
 
   angleWeightPseudoNormales: (dot) ->
     ## Дополним до 24 наш путь
@@ -62,6 +66,14 @@ export class Nova
     ) > @outerRadius
       return false
     else return this
+## то что ниже можно не смотреть... смысла нет
+    relativeX = dot.x - @posX
+    relativeY = dot.y - @posY
+
+    ctx.fillStyle= 'yellow'
+    ctx.fillRect(relativeX-4, relativeY-4, 8,8)
+    ctx.fillRect(@posX-4, @posY-4,8,8)
+    ctx.fillRect(dot.x-4, dot.y-4,8,8)
 
     deltaExists = @path.length % 4
     pathCopy = []
@@ -74,10 +86,10 @@ export class Nova
     # куда пуляем, мсье?
     # т.к. я решил отказаться от angleWeightPseudoNormales алгоритма
     # в силу своей тупости будем работать с двумя лучами выпущенными в рандомном направлении
-    rayX1 = 0
-    rayY1 = 0
+    rayX1 = 600
+    rayY1 = 300
     rayX2 = 600
-    rayY2 = -5000
+    rayY2 = 1200
 
     countFirstRay = 0
     countSecondRay = 0
@@ -90,9 +102,9 @@ export class Nova
 
       # для повышения надежности т.е. если хотя бы один луч пересекает вершины нечетное
       # количество раз - то точка находится внутри фигуры
+      console.log if @intercect_2(dot.x,dot.y,rayX1,rayY1,x+@posX, y+@posY, x1+@posX, y1+@posY)
+#      if @intercect_2(dot.x,dot.y,rayX1,rayY1,x, y, x1, y1)
 
-      if @intersect(dot.x - @posX,dot.y-@posY,rayX1,rayY1,x, y, x1, y1)
-        countFirstRay++
 
       ctx.beginPath()
       ctx.lineTo(dot.x, dot.y)
@@ -100,15 +112,12 @@ export class Nova
       ctx.stroke()
       ctx.closePath()
 
-      if @intersect(dot.x - @posX,dot.y - @posX,rayX2,rayY2,x, y, x1, y1)
-        countSecondRay++
+#      if @intercect_2(dot.x - @posX,dot.y - @posY,rayX2,rayY2,x, y, x1, y1)
+      console.log if @intercect_2(dot.x,dot.y,rayX2,rayY2,x+@posX, y+@posY, x1+@posX, y1+@posY)
       ctx.lineTo(dot.x, dot.y)
       ctx.lineTo(rayX2, rayY2)
       ctx.stroke()
       ctx.closePath()
-
-      return true if (countFirstRay % 2 == 1)
-      return true if (countSecondRay % 2 == 1)
 
     ctx.beginPath()
     for edge,index in pathCopy by 4
@@ -158,7 +167,10 @@ export class Nova
     @path.push(x, y)
 
   draw: () ->
+    # отрисовка смещения
     Drawer.draw(@color, {x: @posX, y: @posY}, @path)
+    # действительная позиция
+#    Drawer.draw(@color, {x: 0, y: 0}, @path)
 
   drawNormales: () ->
     Drawer.normales(@normales, { x: @posX, y: @posY })

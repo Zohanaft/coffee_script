@@ -2,6 +2,13 @@ import { Nova } from './coffee/nova.coffee'
 import { novaCanvas } from './coffee/sceene'
 import { Shapes } from './coffee/shape-fabrick'
 import { Drawer } from "./coffee/drawer"
+# Цвет переключается
+# Но сделано неправильно
+# Я уже не понимаю...
+# сначала пытался вычислить по ближайшим нормалям находится ли точка внутри
+# где-то ошибся
+# потом пытался через пересечения...
+# ни одна из реализаций не работала
 
 SelectedShapeColorCanvas= document.getElementById('selected')
 SelectedShapeColorCanvasCTX = SelectedShapeColorCanvas.getContext('2d')
@@ -11,14 +18,16 @@ MATH_PI = Math.PI * 2
 # фабрика шейпов (т.к. не хочу редактировать её по кд при добавлении новых шейпов)
 # то лучше заполню извне p.s. можно было обойтись без name в append
 # в таком случае создание нового объекта выглядело бы примерно так:
+# shapeFactory.append(Nova)
 # shapeFactory.create(options, Nova)
+
 shapeFactory = new Shapes()
 shapeFactory.append('nova', Nova)
 
 
 # список параметров Nova: цвет, количество вершин, стартовая позиция ориджина (центра фигуры)
 optionList = [
-  ['rgb(204 0 0)', 3, undefined, undefined, 20, 60],
+  ['rgb(204 0 0)', 3, undefined, undefined, 26, 60],
   ['rgb(51 0 153)', 4, undefined, undefined, 26, 60],
   ['rgb(0 204 102)', 5, undefined, undefined, 26, 60],
   ['rgb(255 255 51)', 6, undefined, undefined, 26, 60],
@@ -81,6 +90,7 @@ render = () ->
     x= posX + Math.cos(MATH_PI) * radius
     y= posY + Math.sin(MATH_PI) * radius
     shape.move(x,y)
+#    shape.move(center.x, center.y)
     MATH_PI += step
 
   ## рисуем
