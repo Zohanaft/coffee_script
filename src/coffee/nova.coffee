@@ -34,168 +34,94 @@ export class Nova
       Math.pow(edge2.x - edge1.x, 2) +
         Math.pow( edge2.y - edge1.y, 2))
 
-  existsEdge: (index) ->
-    return @path[index] in @path
+  area: (x1,y1,x2,y2,x3,y3) ->
+    return (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
+
+  intersect_1: (a,b,c,d) ->
+    if (a > b)
+      tmp = a
+      a = b
+      b = tmp
+    if (c > d)
+      tmp = c
+      c = b
+      b = tmp
+    return Math.max(a,c) <= Math.min(b,d)
+
+  intersect: (x1,y1,x2,y2,x3,y3,x4,y4) ->
+    return @intersect_1(x1,x2,x3,x4) and @intersect_1(y1,y2,y3,y4) and @area(x1,y1,x2,y2,x3,y3) * @area(x1,y1,x2,y2,x4,y4) <= 0 and @area(x3,y3,x4,y4,x1,y1) * @area(x3,y3,x4,y4,x2,y2) <=0
+
+
 
   angleWeightPseudoNormales: (dot) ->
-    # Эта функция имеет смысл только для Nova
-    # соответственно если всё выносить в отдельные модули, то необходимо
-    # "ускоряющие функции" передать сюда и выполнить, либо заранее при создании path
-    # указывать размер rect или radius в который вписана фигура
+    ## Дополним до 24 наш путь
+
     if @range(
       {x: @posX, y: @posY},
       {x: dot.x, y: dot.y }
     ) > @outerRadius
-        return false
-      else return this
-    # Я хотел написать алгоритм проверки через нормали, и вынести всё в AngleWeightPsewdoAlgoritm
-    # Выбрал его потому что для простых фигур считается надежным и достаточно быстрым
-    # но не смог
-    # так же хотел добавить функцию которая оборачивает весь контент в rect (задаёт габариты в зависимости от шейпов)
-    # не успел
-    # часть кода хотел вынести в базовый класс SImple Shape чтобы наследовать от него все простые формы
+      return false
+    else return this
 
-#    minVertexRange = Infinity
-#    nearestEdges = []
-#    neighbor = 0
-#
-#    ctx.fillStyle = 'green'
-#    ctx.fillRect(
-#      @posX-2,
-#      @posY-2, 4, 4)
-#    ctx.fillRect(dot.x-2, dot.y-2, 4, 4)
-#
-#    for edges, index in @path by 2
-#      if @existsEdge index + 3
-#        current = @range(
-#          {x: @posX + @path[index], y: @posY +  @path[index+1] },
-#          {x: dot.x, y: dot.y }
-#        )
-#      else
-#        current = @range(
-#          {x: @posX + @path[0], y: @posY +  @path[1]},
-#          {x: dot.x, y: dot.y }
-#        )
-#
-#      if current < minVertexRange
-#        minVertexRange = current
-#        nearestEdges.splice(0,nearestEdges.length)
-#        nearestEdges.push(@path[index], @path[index+1])
-#        neighbor = index
-#
-#    firstNeighborEdge = []
-#    secondNeighborEdge = []
-#    firstNeighborEdgeRange = Infinity
-#    secondNeighborEdgeRange = Infinity
-#
-#    if @existsEdge(neighbor-2)
-#      firstNeighborEdge = [@path[neighbor-1], @path[neighbor-2]]
-#    else
-#      firstNeighborEdge = [@path[@path.length], @path[@path.length-1]]
-#
-#    if @existsEdge(neighbor+3)
-#      secondNeighborEdge = [@path[neighbor+2], @path[neighbor+3]]
-#    else
-#      secondNeighborEdge = [@path[0], @path[1]]
-#
-#    firstNeighborEdgeRange = @range(
-#      { x: firstNeighborEdge[0], y: firstNeighborEdge[1] },
-#      {x: dot.x, y: dot.y }
-#    )
-#
-#    secondNeighborEdgeRange = @range(
-#      { x: secondNeighborEdge[0], y: secondNeighborEdge[1] },
-#      {x: dot.x, y: dot.y }
-#    )
-#
-#    if firstNeighborEdgeRange < secondNeighborEdgeRange
-#      nearestEdges.push firstNeighborEdge...
-#    else
-#      nearestEdges.push secondNeighborEdge...
-#
-#    console.log(nearestEdges)
-#
-#    ctx.fillStyle = 'black'
-#    ctx.fillRect(@posX + nearestEdges[0] - 2, @posY + nearestEdges[1] - 2, 4,4)
-#    ctx.fillRect(@posX + nearestEdges[2] - 2, @posY + firstNeighborEdge[3] - 2, 4,4)
-#
-#    Drawer.line([
-#      @posX + nearestEdges[0],
-#      @posY + nearestEdges[1],
-#      @posX + nearestEdges[2],
-#      @posY + nearestEdges[0]
-#    ])
+    deltaExists = @path.length % 4
+    pathCopy = []
+    pathCopy.push(@path...)
+    for i in [0...deltaExists]
+      pathCopy.push(@path[i])
 
-#    for edges, index in @path by 2
-#      if @path[index + 3]
-#        current = @range(
-#          {x: @posX + @path[index], y: @posY +  @path[index+1] },
-#          {x: dot.x, y: dot.y }
-#        )
-#      else
-#        current = @range(
-#          {x: @posX + @path[0], y: @posY +  @path[1]},
-#          {x: dot.x, y: dot.y }
-#        )
-#      if current < minVertexRange
-#        minVertexRange = current
-#        nearestEdges.splice(0, nearestEdges.length)
-#        if @path[index-2]
-#          prev = -2
-#          for item in @path when prev < 4
-#            nearestEdges.push item
-#            prev++
-#        else
-#          prev = 0
-#          nearestEdges.push @path[@path.length-1]
-#          nearestEdges.push @path[@path.length]
-#          for item in @path when prev < 4
-#            nearestEdges.push item
-#
-#    console.log(nearestEdges)
-#    for edge in nearestEdges by 2
-#      if (nearestEdges[index+3])
-#        Drawer.line([
-#          @posX + nearestEdges[index] - 2,
-#          @posY + nearestEdges[index+1] - 2,
-#          @posX + nearestEdges[index+2] - 2,
-#          @posY + nearestEdges[index+3] - 2
-#        ])
+    # теперь безопасно можно пройтись по массиву
 
-#    x = nearestEdges[0]
-#    y = nearestEdges[1]
-#    x1 = nearestEdges[2]
-#    y1 = nearestEdges[3]
-#
-#    ctx.fillStyle = 'blue'
-#    ctx.fillRect(@posX + x-2, @posY + y-2, 4, 4)
-#    ctx.fillRect(@posX + x1-2, @posY + y1-2, 4, 4)
-#    Drawer.line([@posX + x, @posY + y, @posX + x1, @posY + y1])
-#
-#    dx = x1-x
-#    dy = y1-y
-#    # расстояние между точками отрезка
-#    range = @range(
-#      { x: x, y: y}
-#      { x: x1, y: y1}
-#    )
+    # куда пуляем, мсье?
+    # т.к. я решил отказаться от angleWeightPseudoNormales алгоритма
+    # в силу своей тупости будем работать с двумя лучами выпущенными в рандомном направлении
+    rayX1 = 0
+    rayY1 = 0
+    rayX2 = 600
+    rayY2 = -5000
 
-    # левая нормаль
-    # это важно для определения скалярного произведения
-#    normale = { x: dy, y: -dx }
-#    ctx.fillStyle = 'blue'
-#    ctx.fillRect(@posX + normale.x-2, @posY + normale.y-2, 4, 4)
+    countFirstRay = 0
+    countSecondRay = 0
+    # то что я сейчас делаю очень не оптимально, но мой рантайм уже далеко за 40 часов
+    for edge, index in pathCopy by 4
+      x = edge
+      y = pathCopy[index+1]
+      x1 = pathCopy[index+2]
+      y1 = pathCopy[index+3]
 
-    # нахожу длинну от dot (искомая точка) до отрезка который получили
-#    h = Math.abs((dx*(dot.y-@posY - y)-dy*(dot.x-@posX-x))/range)
-    # рисуем из нашей точки вектор... а хотя... просто косинус ща найду
-#    vec = {x: dot.x-@posX+h, y: dot.y-@posY+h}
-#    scalar = vec.x * normale.x + vec.y * normale.y
-#    cos = scalar / (
-#      Math.pow(vec.x - normale.x, 2) *
-#      Math.pow(vec.y - normale.y, 2)
-#    )
-#    console.log(cos)
+      # для повышения надежности т.е. если хотя бы один луч пересекает вершины нечетное
+      # количество раз - то точка находится внутри фигуры
+
+      if @intersect(dot.x - @posX,dot.y-@posY,rayX1,rayY1,x, y, x1, y1)
+        countFirstRay++
+
+      ctx.beginPath()
+      ctx.lineTo(dot.x, dot.y)
+      ctx.lineTo(rayX1, rayY1)
+      ctx.stroke()
+      ctx.closePath()
+
+      if @intersect(dot.x - @posX,dot.y - @posX,rayX2,rayY2,x, y, x1, y1)
+        countSecondRay++
+      ctx.lineTo(dot.x, dot.y)
+      ctx.lineTo(rayX2, rayY2)
+      ctx.stroke()
+      ctx.closePath()
+
+      return true if (countFirstRay % 2 == 1)
+      return true if (countSecondRay % 2 == 1)
+
+    ctx.beginPath()
+    for edge,index in pathCopy by 4
+      x = pathCopy[index]
+      y = pathCopy[index+1]
+      x1 = pathCopy[index+2]
+      y1 = pathCopy[index+3]
+
+      ctx.lineTo(x+@posX, y+@posY)
+      ctx.lineTo(x1+@posX, y1+@posY)
+    ctx.stroke()
+    ctx.closePath()
+
 
   createNormales: () ->
     for pair, index in @path by 2

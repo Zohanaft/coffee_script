@@ -44,7 +44,6 @@ novaCanvas.onclick = (event) ->
       SelectedShapeColorCanvasCTX.fillRect(0,0,50,50)
       count += 1
 
-  console.log(count)
   if count is 0
     SelectedShapeColorCanvasCTX.fillStyle = 'white'
     SelectedShapeColorCanvasCTX.fillRect(0,0,50,50)
@@ -65,32 +64,32 @@ center = {
 # было бы намного проще если бы я сначала написал библиотеку
 # для работы с векторами (такую я писал давно, но думаю что лишнее, пока что,
 
-#render = () ->
-Drawer.clear()
+render = () ->
+  Drawer.clear()
 
-#MATH_PI += .01
-step = (Math.PI * 2) / shapes.length
-radius = 200
-center = {
-  x: novaCanvas.width / 2,
-  y: novaCanvas.height / 2
-}
-posX = center.x
-posY = center.y
+  MATH_PI += .01
+  step = (Math.PI * 2) / shapes.length
+  radius = 200
+  center = {
+    x: novaCanvas.width / 2,
+    y: novaCanvas.height / 2
+  }
+  posX = center.x
+  posY = center.y
 
-for shape in shapes
-  x= posX + Math.cos(MATH_PI) * radius
-  y= posY + Math.sin(MATH_PI) * radius
-  shape.move(x,y)
-  MATH_PI += step
+  for shape in shapes
+    x= posX + Math.cos(MATH_PI) * radius
+    y= posY + Math.sin(MATH_PI) * radius
+    shape.move(x,y)
+    MATH_PI += step
 
-## рисуем
-shape.draw() for shape in shapes
-# если что-то непонятно - лучше заранее вывести все нормали шейпов и понять - куда накосячил
-# с помощью dot.env при генерации можно отключить вспомогательные конструкции
-# таким образом тестовый код не попадет в продакшн
-shape.drawNormales() for shape in shapes
+  ## рисуем
+  shape.draw() for shape in shapes
+  # если что-то непонятно - лучше заранее вывести все нормали шейпов и понять - куда накосячил
+  # с помощью dot.env при генерации можно отключить вспомогательные конструкции
+  # таким образом тестовый код не попадет в продакшн
+  shape.drawNormales() for shape in shapes
 
-#  requestAnimationFrame(render)
-#
-#render()
+  requestAnimationFrame(render)
+
+render()
