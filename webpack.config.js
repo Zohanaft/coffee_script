@@ -8,6 +8,7 @@ Object.assign(process.env, dotenv.config({ path: '.env' }).parsed);
 module.exports = {
   entry: {
     app: path.join(__dirname, 'src', 'index.coffee'),
+    users: path.join(__dirname, 'src', 'users.coffee')
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
@@ -27,12 +28,19 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      filename: 'index.html',
       template: path.join(__dirname, 'src', 'index.html'),
+      chunks: ['app']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'users.html',
+      template: path.join(__dirname, 'src', 'users.html'),
+      chunks: ['users']
     })
   ],
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist/')
   },
   resolve: {
     extensions: [ '.coffee', '.js' ]
